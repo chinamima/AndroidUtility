@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class PrintObject {
 
+    public static String sTag = "gjj";
+
     public static void field(Object obj) {
         field(obj, "");
     }
@@ -29,7 +31,7 @@ public class PrintObject {
      */
     public static void field(Object obj, String name, int breadth, int depth) {
         if (obj == null) {
-            Log.d(Global.TAG, "===== PrintObject is null!!!");
+            Log.d(sTag, "===== PrintObject is null!!!");
             return;
         }
 
@@ -159,7 +161,7 @@ public class PrintObject {
 //                    sb.append("\"").append("null").append("\"");
 //                    continue;
 //                }
-////                Log.v(Global.TAG, String.format("===== PrintObject value: %s", value.toString()));
+////                Log.v(sTag, String.format("===== PrintObject value: %s", value.toString()));
 //
 //                if (type.equals("java.lang.String")) {
 //                    sb.append("\"").append(value.toString()).append("\"");
