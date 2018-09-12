@@ -15,8 +15,6 @@ import java.util.List;
  */
 public class PrintObject {
 
-    public static String sTag = "gjj";
-
     public static void field(Object obj) {
         field(obj, "");
     }
@@ -31,7 +29,7 @@ public class PrintObject {
      */
     public static void field(Object obj, String name, int breadth, int depth) {
         if (obj == null) {
-            Log.d(sTag, "===== PrintObject is null!!!");
+            LogUtil.w("===== PrintObject is null!!!");
             return;
         }
 

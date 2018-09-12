@@ -7,6 +7,8 @@ import android.util.Log;
  */
 public class LogUtil {
 
+    public static String sTag = "gjj";
+    
     private static final int SIZE_LOG = 3500;
 
     public static void log(int level, String format, Object... args) {
@@ -21,22 +23,22 @@ public class LogUtil {
     protected static void log(int level, String str) {
         switch (level) {
         case 0:
-            Log.wtf(Global.TAG, str);
+            Log.wtf(sTag, str);
             break;
         case 1:
-            Log.e(Global.TAG, str);
+            Log.e(sTag, str);
             break;
         case 2:
-            Log.w(Global.TAG, str);
+            Log.w(sTag, str);
             break;
         case 3:
-            Log.i(Global.TAG, str);
+            Log.i(sTag, str);
             break;
         case 4:
-            Log.d(Global.TAG, str);
+            Log.d(sTag, str);
             break;
         case 5:
-            Log.v(Global.TAG, str);
+            Log.v(sTag, str);
             break;
         }
     }
@@ -62,10 +64,10 @@ public class LogUtil {
     }
 
     public static void e(Throwable throwable, String format, Object... args) {
-        Log.e(Global.TAG, String.format(format, args), throwable);
+        Log.e(sTag, String.format(format, args), throwable);
     }
 
     public static void callStack(String msg) {
-        Log.w(Global.TAG, msg, new Throwable("===== callStack"));
+        Log.w(sTag, msg, new Throwable("===== callStack"));
     }
 }
