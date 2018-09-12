@@ -1,13 +1,12 @@
 package com.gjj.android.utility;
 
+import android.annotation.SuppressLint;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import android.annotation.SuppressLint;
-import android.text.TextUtils;
 
-@SuppressLint("SimpleDateFormat")
 public class TimeUtil {
 	public static final String TAG = "TimeUtil";
 
@@ -16,7 +15,7 @@ public class TimeUtil {
 	public static final String FILE_FORMAT = "yyyy_MM_dd_HH_mm_ss_SSS";
 
 	public static long format(String time, String format) {
-		if (TextUtils.isEmpty(time)) {
+		if (StringUtil.isEmpty(time)) {
 			return 0;
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -43,7 +42,7 @@ public class TimeUtil {
 	}
 
 	public static String format(Date date, String format) {
-		if (TextUtils.isEmpty(format) || date == null) {
+		if (StringUtil.isEmpty(format) || date == null) {
 			return null;
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat(format);

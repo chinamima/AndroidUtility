@@ -1,6 +1,5 @@
 package com.gjj.android.utility;
 
-import android.text.TextUtils;
 
 import java.security.MessageDigest;
 import java.util.Locale;
@@ -26,7 +25,7 @@ public class EncryptUtil {
 
     public static String getMD5(String text) {
         String md5 = null;
-        if (TextUtils.isEmpty(text)) {
+        if (StringUtil.isEmpty(text)) {
             return md5;
         }
         MessageDigest md5Digest = null;
@@ -74,7 +73,7 @@ public class EncryptUtil {
 
     public static String getSHA1(String text) {
         String sha1 = null;
-        if (TextUtils.isEmpty(text)) {
+        if (StringUtil.isEmpty(text)) {
             return sha1;
         }
         MessageDigest sha1Digest = null;

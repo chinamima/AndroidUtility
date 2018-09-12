@@ -16,4 +16,8 @@ public class StringUtil {
         }
         return sb.substring(0,sb.length() - 1);
     }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.length() == 0;
+    }
 }

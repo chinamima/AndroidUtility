@@ -1,6 +1,5 @@
 package com.gjj.android.utility;
 
-import android.text.TextUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class FileUtil {
     }
 
     public static String getParent(String absPath) {
-        if (TextUtils.isEmpty(absPath)) {
+        if (StringUtil.isEmpty(absPath)) {
             return null;
         }
         absPath = cleanPath(absPath);
@@ -237,7 +236,7 @@ public class FileUtil {
     }
 
     public static boolean move(String srcPath, String dstPath, boolean force) {
-        if (TextUtils.isEmpty(srcPath) || TextUtils.isEmpty(dstPath)) {
+        if (StringUtil.isEmpty(srcPath) || StringUtil.isEmpty(dstPath)) {
             return false;
         }
 
@@ -264,7 +263,7 @@ public class FileUtil {
     }
 
     public static boolean delete(String absPath) {
-        if (TextUtils.isEmpty(absPath)) {
+        if (StringUtil.isEmpty(absPath)) {
             return false;
         }
 
@@ -292,7 +291,7 @@ public class FileUtil {
     }
 
     public static boolean exists(String absPath) {
-        if (TextUtils.isEmpty(absPath)) {
+        if (StringUtil.isEmpty(absPath)) {
             return false;
         }
         File file = new File(absPath);
@@ -308,7 +307,7 @@ public class FileUtil {
     }
 
     public static boolean copy(String srcPath, String dstPath, boolean force) {
-        if (TextUtils.isEmpty(srcPath) || TextUtils.isEmpty(dstPath)) {
+        if (StringUtil.isEmpty(srcPath) || StringUtil.isEmpty(dstPath)) {
             return false;
         }
 
@@ -382,7 +381,7 @@ public class FileUtil {
     }
 
     public static boolean create(String absPath, boolean force) {
-        if (TextUtils.isEmpty(absPath)) {
+        if (StringUtil.isEmpty(absPath)) {
             return false;
         }
 
@@ -403,7 +402,7 @@ public class FileUtil {
     }
 
     public static String cleanPath(String absPath) {
-        if (TextUtils.isEmpty(absPath)) {
+        if (StringUtil.isEmpty(absPath)) {
             return absPath;
         }
         try {
