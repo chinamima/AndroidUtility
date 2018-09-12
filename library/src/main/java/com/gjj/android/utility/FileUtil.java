@@ -1,13 +1,8 @@
 package com.gjj.android.utility;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.UnsupportedEncodingException;
+import android.text.TextUtils;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +11,45 @@ import java.util.List;
  * Created by guojinjun on 2018/06/05.
  */
 public class FileUtil {
+
+    private static final int IO_BUFFER_SIZE = 4096;
+
+    public static boolean isFile(String absPath) {
+        boolean exists = exists(absPath);
+        if (!exists) {
+            return false;
+        }
+
+        File file = new File(absPath);
+        return isFile(file);
+    }
+
+    public static boolean isFile(File file) {
+        return file != null && file.isFile();
+    }
+
+    public static boolean isFolder(String absPath) {
+        boolean exists = exists(absPath);
+        if (!exists) {
+            return false;
+        }
+
+        File file = new File(absPath);
+        return file.isDirectory();
+    }
+
+    public static String getParent(File file) {
+        return file == null ? null : file.getParent();
+    }
+
+    public static String getParent(String absPath) {
+        if (TextUtils.isEmpty(absPath)) {
+            return null;
+        }
+        absPath = cleanPath(absPath);
+        File file = new File(absPath);
+        return getParent(file);
+    }
 
     public static String readFile(String path) {
         List<String> list = readFile2List(path);
@@ -103,8 +137,6 @@ public class FileUtil {
         }
     }
 
-
-
     public static boolean writeFile(String path, String content) {
         return writeFile(path, content, false);
     }
@@ -188,8 +220,6 @@ public class FileUtil {
         return true;
     }
 
-
-
     public static List<String> getAllFilePath(File root) {
         List<String> result = new LinkedList<>();
         if (root.isFile()) {
@@ -204,5 +234,205 @@ public class FileUtil {
             }
         }
         return result;
+    }
+
+    public static boolean move(String srcPath, String dstPath, boolean force) {
+        if (TextUtils.isEmpty(srcPath) || TextUtils.isEmpty(dstPath)) {
+            return false;
+        }
+
+        if (!exists(srcPath)) {
+            return false;
+        }
+
+        if (exists(dstPath)) {
+            if (!force) {
+                return false;
+            } else {
+                delete(dstPath);
+            }
+        }
+
+        try {
+            File srcFile = new File(srcPath);
+            File dstFile = new File(dstPath);
+            return srcFile.renameTo(dstFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean delete(String absPath) {
+        if (TextUtils.isEmpty(absPath)) {
+            return false;
+        }
+
+        File file = new File(absPath);
+        return delete(file);
+    }
+
+    public static boolean delete(File file) {
+        if (!exists(file)) {
+            return true;
+        }
+
+        if (file.isFile()) {
+            return file.delete();
+        }
+
+        boolean result = true;
+        File files[] = file.listFiles();
+        for (int index = 0; index < files.length; index++) {
+            result |= delete(files[index]);
+        }
+        result |= file.delete();
+
+        return result;
+    }
+
+    public static boolean exists(String absPath) {
+        if (TextUtils.isEmpty(absPath)) {
+            return false;
+        }
+        File file = new File(absPath);
+        return exists(file);
+    }
+
+    public static boolean exists(File file) {
+        return file == null ? false : file.exists();
+    }
+
+    public static boolean copy(String srcPath, String dstPath) {
+        return copy(srcPath, dstPath, false);
+    }
+
+    public static boolean copy(String srcPath, String dstPath, boolean force) {
+        if (TextUtils.isEmpty(srcPath) || TextUtils.isEmpty(dstPath)) {
+            return false;
+        }
+
+        // check if copy source equals destination
+        if (srcPath.equals(dstPath)) {
+            return true;
+        }
+
+        // check if source file exists or is a directory
+        if (!exists(srcPath) || !isFile(srcPath)) {
+            return false;
+        }
+
+        // delete old content
+        if (exists(dstPath)) {
+            if (!force) {
+                return false;
+            } else {
+                delete(dstPath);
+            }
+        }
+        if (!create(dstPath)) {
+            return false;
+        }
+
+        FileInputStream in = null;
+        FileOutputStream out = null;
+
+        // get streams
+        try {
+            in = new FileInputStream(srcPath);
+            out = new FileOutputStream(dstPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return copy(in, out);
+    }
+
+    public static boolean copy(InputStream is, OutputStream os) {
+        if (is == null || os == null) {
+            return false;
+        }
+
+        try {
+            byte[] buffer = new byte[IO_BUFFER_SIZE];
+            int length;
+            while ((length = is.read(buffer)) != -1) {
+                os.write(buffer, 0, length);
+            }
+            os.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                is.close();
+            } catch (Exception ignore) {
+            }
+            try {
+                os.close();
+            } catch (Exception ignore) {
+
+            }
+        }
+        return true;
+    }
+
+    public static boolean create(String absPath) {
+        return create(absPath, false);
+    }
+
+    public static boolean create(String absPath, boolean force) {
+        if (TextUtils.isEmpty(absPath)) {
+            return false;
+        }
+
+        if (exists(absPath)) {
+            return true;
+        }
+
+        String parentPath = getParent(absPath);
+        mkdirs(parentPath, force);
+
+        try {
+            File file = new File(absPath);
+            return file.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String cleanPath(String absPath) {
+        if (TextUtils.isEmpty(absPath)) {
+            return absPath;
+        }
+        try {
+            File file = new File(absPath);
+            absPath = file.getCanonicalPath();
+        } catch (Exception e) {
+
+        }
+        return absPath;
+    }
+
+    public static boolean mkdirs(String absPath) {
+        return mkdirs(absPath, false);
+    }
+
+    public static boolean mkdirs(String absPath, boolean force) {
+        File file = new File(absPath);
+        if (exists(absPath) && !isFolder(absPath)) {
+            if (!force) {
+                return false;
+            } else {
+                delete(file);
+            }
+        }
+        try {
+            file.mkdirs();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return exists(file);
     }
 }
