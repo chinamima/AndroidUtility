@@ -1,6 +1,5 @@
 package com.gjj.android.utility;
 
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,293 +12,17 @@ public class FileUtil {
 
     private static final int IO_BUFFER_SIZE = 4096;
 
-    public static boolean isFile(String absPath) {
-        boolean exists = exists(absPath);
-        if (!exists) {
-            return false;
-        }
-
-        File file = new File(absPath);
-        return isFile(file);
-    }
-
-    public static boolean isFile(File file) {
-        return file != null && file.isFile();
-    }
-
-    public static boolean isFolder(String absPath) {
-        boolean exists = exists(absPath);
-        if (!exists) {
-            return false;
-        }
-
-        File file = new File(absPath);
-        return file.isDirectory();
-    }
-
-    public static String getParent(File file) {
-        return file == null ? null : file.getParent();
-    }
-
-    public static String getParent(String absPath) {
+    public static String cleanPath(String absPath) {
         if (StringUtil.isEmpty(absPath)) {
-            return null;
+            return absPath;
         }
-        absPath = cleanPath(absPath);
-        File file = new File(absPath);
-        return getParent(file);
-    }
-
-    public static String readFile(String path) {
-        List<String> list = readFile2List(path);
-        if (list == null) {
-            return null;
-        }
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < list.size(); i++) {
-            sb.append(list.get(i)).append("\n");
-        }
-        return sb.toString();
-    }
-
-    public static List<String> readFile2List(String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            return null;
-        }
-
-        int sum = 0;
-        LineNumberReader lnr = null;
         try {
-            lnr = new LineNumberReader(new FileReader(file));
-            lnr.skip(file.length());
-            sum = lnr.getLineNumber();
+            File file = new File(absPath);
+            absPath = file.getCanonicalPath();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (lnr != null) {
-                try {
-                    lnr.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+
         }
-
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(file));
-            List<String> list = new ArrayList<>(sum);
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                list.add(line);
-            }
-            return list;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static byte[] readFile2Byte(String path) {
-        File file = new File(path);
-        if (!file.exists()) {
-            return null;
-        }
-
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            byte[] result = new byte[fis.available()];
-            fis.read(result);
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static boolean writeFile(String path, String content) {
-        return writeFile(path, content, false);
-    }
-
-    public static boolean writeFile(String path, String content, boolean append) {
-        try {
-            return writeFile(path, content.getBytes("utf-8"), append);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return false;
-        }
-//        File file = new File(path);
-//        BufferedWriter bw = null;
-//        try {
-//            if (file.exists()) {
-//                if (!append) {
-//                    file.delete();
-//                }
-//            } else {
-//                file.getParentFile().mkdirs();
-//            }
-//            file.createNewFile();
-//            bw = new BufferedWriter(new FileWriter(file, append));
-//            bw.write(content);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return false;
-//        } finally {
-//            if (bw != null) {
-//                try {
-//                    bw.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//        return true;
-    }
-
-    public static boolean copyFile(String src, String dst) {
-        String content = readFile(src);
-        if (content == null) {
-            return false;
-        }
-        return writeFile(dst, content);
-    }
-
-    public static boolean writeFile(String path, byte[] content) {
-        return writeFile(path, content, false);
-    }
-
-    public static boolean writeFile(String path, byte[] content, boolean append) {
-        if (content == null || content.length < 1) {
-            return false;
-        }
-        File file = new File(path);
-        FileOutputStream fos = null;
-        try {
-            if (file.exists()) {
-                if (!append) {
-                    file.delete();
-                }
-            } else {
-                file.getParentFile().mkdirs();
-            }
-            file.createNewFile();
-            fos = new FileOutputStream(file, append);
-            fos.write(content);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return true;
-    }
-
-    public static List<String> getAllFilePath(File root) {
-        List<String> result = new LinkedList<>();
-        if (root.isFile()) {
-            result.add(root.getAbsolutePath());
-        } else {
-            File[] children = root.listFiles();
-            if (children != null) {
-                for (int i = 0; i < children.length; i++) {
-                    List<String> list = getAllFilePath(children[i]);
-                    result.addAll(list);
-                }
-            }
-        }
-        return result;
-    }
-
-    public static boolean move(String srcPath, String dstPath, boolean force) {
-        if (StringUtil.isEmpty(srcPath) || StringUtil.isEmpty(dstPath)) {
-            return false;
-        }
-
-        if (!exists(srcPath)) {
-            return false;
-        }
-
-        if (exists(dstPath)) {
-            if (!force) {
-                return false;
-            } else {
-                delete(dstPath);
-            }
-        }
-
-        try {
-            File srcFile = new File(srcPath);
-            File dstFile = new File(dstPath);
-            return srcFile.renameTo(dstFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public static boolean delete(String absPath) {
-        if (StringUtil.isEmpty(absPath)) {
-            return false;
-        }
-
-        File file = new File(absPath);
-        return delete(file);
-    }
-
-    public static boolean delete(File file) {
-        if (!exists(file)) {
-            return true;
-        }
-
-        if (file.isFile()) {
-            return file.delete();
-        }
-
-        boolean result = true;
-        File files[] = file.listFiles();
-        for (int index = 0; index < files.length; index++) {
-            result |= delete(files[index]);
-        }
-        result |= file.delete();
-
-        return result;
-    }
-
-    public static boolean exists(String absPath) {
-        if (StringUtil.isEmpty(absPath)) {
-            return false;
-        }
-        File file = new File(absPath);
-        return exists(file);
-    }
-
-    public static boolean exists(File file) {
-        return file == null ? false : file.exists();
+        return absPath;
     }
 
     public static boolean copy(String srcPath, String dstPath) {
@@ -376,6 +99,14 @@ public class FileUtil {
         return true;
     }
 
+    public static boolean copyFile(String src, String dst) {
+        String content = readFile(src);
+        if (content == null) {
+            return false;
+        }
+        return writeFile(dst, content);
+    }
+
     public static boolean create(String absPath) {
         return create(absPath, false);
     }
@@ -401,17 +132,97 @@ public class FileUtil {
         return false;
     }
 
-    public static String cleanPath(String absPath) {
+    public static boolean delete(String absPath) {
         if (StringUtil.isEmpty(absPath)) {
-            return absPath;
+            return false;
         }
-        try {
-            File file = new File(absPath);
-            absPath = file.getCanonicalPath();
-        } catch (Exception e) {
 
+        File file = new File(absPath);
+        return delete(file);
+    }
+
+    public static boolean delete(File file) {
+        if (!exists(file)) {
+            return true;
         }
-        return absPath;
+
+        if (file.isFile()) {
+            return file.delete();
+        }
+
+        boolean result = true;
+        File files[] = file.listFiles();
+        for (int index = 0; index < files.length; index++) {
+            result |= delete(files[index]);
+        }
+        result |= file.delete();
+
+        return result;
+    }
+
+    public static boolean exists(String absPath) {
+        if (StringUtil.isEmpty(absPath)) {
+            return false;
+        }
+        File file = new File(absPath);
+        return exists(file);
+    }
+
+    public static boolean exists(File file) {
+        return file == null ? false : file.exists();
+    }
+
+    public static List<String> getAllFilePath(File root) {
+        List<String> result = new LinkedList<>();
+        if (root.isFile()) {
+            result.add(root.getAbsolutePath());
+        } else {
+            File[] children = root.listFiles();
+            if (children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    List<String> list = getAllFilePath(children[i]);
+                    result.addAll(list);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static String getParent(File file) {
+        return file == null ? null : file.getParent();
+    }
+
+    public static String getParent(String absPath) {
+        if (StringUtil.isEmpty(absPath)) {
+            return null;
+        }
+        absPath = cleanPath(absPath);
+        File file = new File(absPath);
+        return getParent(file);
+    }
+
+    public static boolean isFile(String absPath) {
+        boolean exists = exists(absPath);
+        if (!exists) {
+            return false;
+        }
+
+        File file = new File(absPath);
+        return isFile(file);
+    }
+
+    public static boolean isFile(File file) {
+        return file != null && file.isFile();
+    }
+
+    public static boolean isFolder(String absPath) {
+        boolean exists = exists(absPath);
+        if (!exists) {
+            return false;
+        }
+
+        File file = new File(absPath);
+        return file.isDirectory();
     }
 
     public static boolean mkdirs(String absPath) {
@@ -433,5 +244,178 @@ public class FileUtil {
             e.printStackTrace();
         }
         return exists(file);
+    }
+
+    public static boolean move(String srcPath, String dstPath, boolean force) {
+        if (StringUtil.isEmpty(srcPath) || StringUtil.isEmpty(dstPath)) {
+            return false;
+        }
+
+        if (!exists(srcPath)) {
+            return false;
+        }
+
+        if (exists(dstPath)) {
+            if (!force) {
+                return false;
+            } else {
+                delete(dstPath);
+            }
+        }
+
+        try {
+            File srcFile = new File(srcPath);
+            File dstFile = new File(dstPath);
+            return srcFile.renameTo(dstFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String readFile(String path) {
+        List<String> list = readFile2List(path);
+        if (list == null) {
+            return null;
+        }
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static byte[] readFile2Byte(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            byte[] result = new byte[fis.available()];
+            fis.read(result);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static List<String> readFile2List(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
+
+        int sum = 0;
+        LineNumberReader lnr = null;
+        try {
+            lnr = new LineNumberReader(new FileReader(file));
+            lnr.skip(file.length());
+            sum = lnr.getLineNumber();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (lnr != null) {
+                try {
+                    lnr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(file));
+            List<String> list = new ArrayList<>(sum);
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                list.add(line);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static boolean writeFile(String path, String content) {
+        return writeFile(path, content, false);
+    }
+
+    public static boolean writeFile(String path, String content, boolean append) {
+        try {
+            return writeFile(path, content.getBytes("utf-8"), append);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean writeFile(String path, byte[] content, boolean append) {
+        if (content == null || content.length < 1) {
+            return false;
+        }
+        File file = new File(path);
+        FileOutputStream fos = null;
+        try {
+            if (file.exists()) {
+                if (!append) {
+                    file.delete();
+                }
+            } else {
+                file.getParentFile().mkdirs();
+            }
+            file.createNewFile();
+            fos = new FileOutputStream(file, append);
+            fos.write(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean writeFile(String path, byte[] content) {
+        return writeFile(path, content, false);
+    }
+
+    public static boolean writeFile(String path, List<String> listContent) {
+        if (listContent == null || listContent.isEmpty()) {
+            return false;
+        }
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < listContent.size(); i++) {
+            sb.append(listContent.get(i)).append("\n");
+        }
+        return writeFile(path, sb.toString());
     }
 }
