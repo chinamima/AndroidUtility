@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by guojinjun on 2018/06/05.
@@ -173,22 +175,47 @@ public class FileUtil {
         return file == null ? false : file.exists();
     }
 
-    public static List<File> listChild(String dir) {
-        if (dir == null || dir.trim().length() < 1) {
+
+
+    public static String[] listChildren(File dir, FilenameFilter filter) {
+        if (dir == null) {
             return null;
         }
-        return listChild(new File(dir));
+        if (filter == null) {
+            return dir.list();
+        } else {
+            return dir.list(filter);
+        }
     }
 
-    public static List<File> listChild(File dir) {
-        if (dir == null || !dir.exists()) {
+    public static String[] listChildren(File dir) {
+        return listChildren(dir, null);
+    }
+
+    public static String[] listChildren(String strDir, FilenameFilter filter) {
+        if (strDir == null) {
             return null;
         }
-        File[] arrChild = dir.listFiles();
-        if (arrChild == null) {
-            return null;
-        }
-        return Arrays.asList(arrChild);
+        return listChildren(new File(strDir), filter);
+    }
+
+    public static String[] listChildren(String strDir) {
+        return listChildren(strDir, null);
+    }
+
+    public static String[] listChildrenRegex(String strDir, String regex) {
+        final Pattern pattern = Pattern.compile(regex);
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                Matcher matcher = pattern.matcher(name);
+                if (matcher.find()) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return listChildren(strDir, filter);
     }
 
     public static List<String> getAllFilePath(File root) {
