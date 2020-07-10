@@ -2,6 +2,7 @@ package com.gjj.android.utility;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -170,6 +171,24 @@ public class FileUtil {
 
     public static boolean exists(File file) {
         return file == null ? false : file.exists();
+    }
+
+    public static List<File> listChild(String dir) {
+        if (dir == null || dir.trim().length() < 1) {
+            return null;
+        }
+        return listChild(new File(dir));
+    }
+
+    public static List<File> listChild(File dir) {
+        if (dir == null || !dir.exists()) {
+            return null;
+        }
+        File[] arrChild = dir.listFiles();
+        if (arrChild == null) {
+            return null;
+        }
+        return Arrays.asList(arrChild);
     }
 
     public static List<String> getAllFilePath(File root) {
