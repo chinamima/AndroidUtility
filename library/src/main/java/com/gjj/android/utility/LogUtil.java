@@ -8,10 +8,19 @@ import android.util.Log;
 public class LogUtil {
 
     public static String sTag = "gjj";
-    
+
     private static final int SIZE_LOG = 3500;
 
+    private static int sLevel = Log.VERBOSE;
+
+    public static void setLevel(int lv) {
+        sLevel = lv;
+    }
+
     public static void log(int level, String format, Object... args) {
+        if (sLevel > level){
+            return;
+        }
         String str = String.format(format, args);
         int index = 0;
         for (; index + SIZE_LOG < str.length(); index += SIZE_LOG) {
@@ -22,24 +31,23 @@ public class LogUtil {
 
     protected static void log(int level, String str) {
         switch (level) {
-        case 0:
-            Log.wtf(sTag, str);
-            break;
-        case 1:
-            Log.e(sTag, str);
-            break;
-        case 2:
-            Log.w(sTag, str);
-            break;
-        case 3:
-            Log.i(sTag, str);
-            break;
-        case 4:
-            Log.d(sTag, str);
-            break;
-        case 5:
-            Log.v(sTag, str);
-            break;
+            case Log.ERROR:
+                Log.e(sTag, str);
+                break;
+            case Log.WARN:
+                Log.w(sTag, str);
+                break;
+            case Log.INFO:
+                Log.i(sTag, str);
+                break;
+            case Log.DEBUG:
+                Log.d(sTag, str);
+                break;
+            case Log.VERBOSE:
+                Log.v(sTag, str);
+                break;
+            default:
+                Log.wtf(sTag, str);
         }
     }
 
