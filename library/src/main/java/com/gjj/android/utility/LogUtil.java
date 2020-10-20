@@ -52,23 +52,23 @@ public class LogUtil {
     }
 
     public static void v(String format, Object... args) {
-        log(5, format, args);
+        log(Log.VERBOSE, format, args);
     }
 
     public static void d(String format, Object... args) {
-        log(4, format, args);
+        log(Log.DEBUG, format, args);
     }
 
     public static void i(String format, Object... args) {
-        log(3, format, args);
+        log(Log.INFO, format, args);
     }
 
     public static void w(String format, Object... args) {
-        log(2, format, args);
+        log(Log.WARN, format, args);
     }
 
     public static void e(String format, Object... args) {
-        log(1, format, args);
+        log(Log.ERROR, format, args);
     }
 
     public static void e(Throwable throwable, String format, Object... args) {
